@@ -182,6 +182,11 @@ const handleSubmit = (rightsData?: any) => {
 watch(() => props.visible, (newVal) => {
   if (newVal) {
     currentStep.value = 1;
+    rightsStep.value = 1;
+    selectedReason.value = '';
+    description.value = '';
+    identityType.value = '';
+    fileList.value = [];
   }
 });
 </script>

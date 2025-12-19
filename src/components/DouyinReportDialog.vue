@@ -192,14 +192,8 @@ const handleSubmit = () => {
 
 // 监听 visible
 watch(() => props.visible, (newVal) => {
-  if (!newVal) {
-    // 关闭时重置状态
-    setTimeout(() => {
-      resetForm();
-    }, 300);
-  } else {
-    // 再次打开时确保从第一步开始
-    currentStep.value = 1;
+  if (newVal) {
+    resetForm();
   }
 });
 </script>
