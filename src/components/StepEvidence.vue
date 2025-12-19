@@ -281,9 +281,17 @@ const handleSubmit = () => {
 }
 
 .footer-btn-wrap {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   padding: 16px 0;
-  background: #fff;
-  z-index: 10;
+  background-color: #fff;
+  // box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); /* 顶部阴影，与内容区分 */
+  z-index: 100;
+  flex-shrink: 0;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
 .submit-btn {
@@ -292,14 +300,17 @@ const handleSubmit = () => {
   background: #ffb5be;
   color: #fff;
   border: none;
-  border-radius: 24px;
+  border-radius: 24px; /* 大圆角，符合小红书风格 */
   font-size: 16px;
   font-weight: 600;
   transition: all 0.3s;
   cursor: not-allowed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &.active {
-    background: #ff2442;
+    background: #ff2442; /* 小红书品牌色 */
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(255, 36, 66, 0.2);
 

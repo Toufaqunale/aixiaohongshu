@@ -30,6 +30,7 @@ const identityType = ref(''); // 'personal' | 'organization'
 const rightsStep = ref(1); // 权益流程子步骤
 const fileList = ref<any[]>([]);
 
+// Refs 用于测量高度
 const wrapperHeight = ref('450px'); // 默认高度
 
 const measureHeights = async () => {
@@ -42,7 +43,7 @@ const measureHeights = async () => {
   }
 };
 
-watch(currentStep, () => {
+watch([currentStep, rightsStep], () => {
   measureHeights();
 });
 
