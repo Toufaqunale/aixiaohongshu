@@ -30,9 +30,6 @@ const identityType = ref(''); // 'personal' | 'organization'
 const rightsStep = ref(1); // 权益流程子步骤
 const fileList = ref<any[]>([]);
 
-// Refs 用于测量高度
-const step1Ref = ref<HTMLElement | null>(null);
-const step2Ref = ref<HTMLElement | null>(null);
 const wrapperHeight = ref('450px'); // 默认高度
 
 const measureHeights = async () => {
@@ -210,7 +207,7 @@ watch(() => props.visible, (newVal) => {
       <div class="step-wrapper" :style="{ minHeight: wrapperHeight }">
         <transition name="slide" mode="out-in">
           <!-- 第一步：选择原因 -->
-          <div v-if="currentStep === 1" class="step-content" ref="step1Ref" key="step1">
+          <div v-if="currentStep === 1" class="step-content" key="step1">
             <!-- 醒目选项：权益侵犯 -->
             <div class="special-option-wrap">
               <div class="special-option" @click="selectReason('侵犯我/我的组织权益')">
@@ -246,7 +243,7 @@ watch(() => props.visible, (newVal) => {
           </div>
 
           <!-- 第二步：补充详情 -->
-          <div v-else-if="currentStep === 2" class="step-content" ref="step2Ref" key="step2">
+          <div v-else-if="currentStep === 2" class="step-content" key="step2">
             <div class="detail-form">
               <div class="input-section">
                 <textarea 
