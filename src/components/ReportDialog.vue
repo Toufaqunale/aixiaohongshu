@@ -37,16 +37,17 @@ const wrapperHeight = ref('450px'); // 默认高度
 
 const measureHeights = async () => {
   await nextTick();
-  // 我们在内存中或临时渲染中测量，或者根据内容预估
-  // 实际开发中可以切换步骤并记录
-  console.log('--- 举报弹窗高度诊断 ---');
-  if (step1Ref.value) console.log('步骤1 (原因选择) 高度:', step1Ref.value.offsetHeight);
-  if (step2Ref.value) console.log('步骤2 (补充描述) 高度:', step2Ref.value.offsetHeight);
-  
-  // 根据内容复杂度，通常步骤2（包含文本域和上传）更高，设定一个稳定的 min-height
-  // 这里我们设定为 460px 作为一个安全值，避免大多数情况下的抖动
-  wrapperHeight.value = '460px';
+  // 根据步骤设定不同的高度
+  if (currentStep.value === 4) {
+    wrapperHeight.value = '550px'; // 权益流程内容较多，设定更高
+  } else {
+    wrapperHeight.value = '460px';
+  }
 };
+
+watch(currentStep, () => {
+  measureHeights();
+});
 
 onMounted(() => {
   measureHeights();
@@ -621,7 +622,8 @@ watch(() => props.visible, (newVal) => {
 
 .step-wrapper {
   position: relative;
-  overflow: hidden;
+  overflow-y: visible; /* 允许垂直内容溢出，由内部容器控制滚动 */
+  overflow-x: hidden;
   background: #fff;
   transition: height 0.3s ease;
   will-change: height, transform;

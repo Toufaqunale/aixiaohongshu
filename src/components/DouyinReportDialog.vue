@@ -60,7 +60,7 @@ const reportCategories = ref([
   }, 
   { 
     title: '侵权', 
-    icon: 'copyright-o', 
+    icon: 'warning-o',
     subOptions: [ 
       { text: '盗用作品', desc: '未经许可转载、搬运或重新发布他人原创视频' }, 
       { text: '冒充他人', desc: '假冒明星、名人、官方机构或其他用户' }, 
@@ -70,7 +70,7 @@ const reportCategories = ref([
   }, 
   { 
     title: '低俗色情', 
-    icon: 'eye-o', 
+    icon: 'closed-eye', 
     subOptions: [ 
       { text: '色情暴露', desc: '直接展示或暗示性行为、敏感部位' }, 
       { text: '低俗行为', desc: '以性暗示为目的的挑逗、低俗表演或言论' }, 
@@ -79,7 +79,7 @@ const reportCategories = ref([
   }, 
   { 
     title: '虚假不实', 
-    icon: 'close', 
+    icon: 'info-o', 
     subOptions: [ 
       { text: '造谣传谣', desc: '散布未经证实、损害公共利益或他人的谣言' }, 
       { text: '虚假营销', desc: '发布虚假广告、夸大宣传、欺诈性销售' }, 

@@ -175,10 +175,14 @@ const handleSubmit = () => {
 
 .evidence-form {
   flex: 1;
+  max-height: 65vh; /* 使用相对于屏幕高度的百分比，适配移动端 */
   overflow-y: auto;
   overflow-x: hidden;
-  max-width: 100%;
+  -webkit-overflow-scrolling: touch; /* 【关键】启用iOS弹性滚动 */
+  overscroll-behavior-y: contain; /* 防止滚动链影响到背景层 */
   padding-bottom: 20px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .form-item {
