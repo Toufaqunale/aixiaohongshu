@@ -32,11 +32,11 @@ const emit = defineEmits(['finish']);
 <style scoped lang="scss">
 .step-confirmed {
   padding: 40px 24px;
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  min-height: 100%; /* 确保内容撑开高度 */
 }
 
 .success-content {

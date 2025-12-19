@@ -154,13 +154,19 @@ const handleSubmit = () => {
 <style scoped lang="scss">
 .step-evidence {
   padding: 0 16px;
-  height: 100%;
   display: flex;
   flex-direction: column;
   max-width: 100%;
   overflow-x: hidden;
   box-sizing: border-box;
+  min-height: 0; /* 允许内容自然撑开 */
+  /* === 【修复核心】添加以下两个属性 === */
+    overflow-y: auto; /* 1. 启用垂直滚动 */
+    -webkit-overflow-scrolling: touch; /* 2. 启用移动端弹性滚动（关键！）*/
 
+    /* === 【可选但推荐】添加强制性高度约束 === */
+    /* 方案A：设定一个最大高度（视情况调整数值） */
+    max-height: 70vh;
   * {
     box-sizing: border-box;
   }
@@ -174,15 +180,9 @@ const handleSubmit = () => {
 }
 
 .evidence-form {
-  flex: 1;
-  max-height: 65vh; /* 使用相对于屏幕高度的百分比，适配移动端 */
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch; /* 【关键】启用iOS弹性滚动 */
-  overscroll-behavior-y: contain; /* 防止滚动链影响到背景层 */
-  padding-bottom: 20px;
-  box-sizing: border-box;
+  /* 移除固定高度和内部滚动，由父容器统一处理滚动 */
   width: 100%;
+  padding-bottom: 20px;
 }
 
 .form-item {
@@ -281,41 +281,38 @@ const handleSubmit = () => {
 }
 
 .submit-button-container {
+  /* 固定在底部 */
   position: sticky;
   bottom: 0;
   left: 0;
-  width: 100%;
+  width: calc(100% + 32px); /* 补偿父容器的 padding */
+  margin-left: -16px;
   padding: 16px;
-  background-color: #fff; /* 可添加轻微背景防止遮挡 */
+  background-color: #fff;
+  // box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   z-index: 100;
-  flex-shrink: 0;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom)); /* 适配 iOS 安全区域 */
   box-sizing: border-box;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom)); /* 适配 iOS 安全区域 */
 }
 
 .submit-button {
   width: 100%;
-  height: 48px;
-  background-color: #ffb5be;
+  height: 44px;
+  background-color: #ccc;
   color: white;
   border: none;
-  border-radius: 24px; /* 大圆角，符合小红书风格 */
-  padding: 12px;
+  border-radius: 22px;
   font-size: 16px;
   font-weight: 600;
   transition: all 0.3s;
   cursor: not-allowed;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
   &.active {
-    background-color: #ff2442; /* 小红书品牌色 */
+    background-color: #ff2442;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 36, 66, 0.2);
-
+    
     &:active {
-      opacity: 0.9;
+      opacity: 0.8;
       transform: scale(0.98);
     }
   }

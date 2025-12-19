@@ -620,7 +620,9 @@ watch(() => props.visible, (newVal) => {
 
 .step-wrapper {
   position: relative;
-  overflow-y: visible; /* 允许垂直内容溢出，由内部容器控制滚动 */
+  flex: 1;
+  overflow-y: auto; /* 统一在此处开启滚动 */
+  -webkit-overflow-scrolling: touch;
   overflow-x: hidden;
   background: #fff;
   transition: height 0.3s ease;
@@ -630,6 +632,9 @@ watch(() => props.visible, (newVal) => {
 .step-content {
   width: 100%;
   max-width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
   overflow-x: hidden;
   box-sizing: border-box;
   padding-bottom: constant(safe-area-inset-bottom);
