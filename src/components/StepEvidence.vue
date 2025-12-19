@@ -138,9 +138,9 @@ const handleSubmit = () => {
       </div>
     </div>
 
-    <div class="footer-btn-wrap">
+    <div class="submit-button-container">
       <button 
-        class="submit-btn" 
+        class="submit-button" 
         :class="{ active: isFormValid }"
         :disabled="!isFormValid"
         @click="handleSubmit"
@@ -280,27 +280,27 @@ const handleSubmit = () => {
   z-index: 1;
 }
 
-.footer-btn-wrap {
+.submit-button-container {
   position: sticky;
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 16px 0;
-  background-color: #fff;
-  // box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); /* 顶部阴影，与内容区分 */
+  padding: 16px;
+  background-color: #fff; /* 可添加轻微背景防止遮挡 */
   z-index: 100;
   flex-shrink: 0;
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  padding-bottom: calc(16px + env(safe-area-inset-bottom)); /* 适配 iOS 安全区域 */
   box-sizing: border-box;
 }
 
-.submit-btn {
+.submit-button {
   width: 100%;
   height: 48px;
-  background: #ffb5be;
-  color: #fff;
+  background-color: #ffb5be;
+  color: white;
   border: none;
   border-radius: 24px; /* 大圆角，符合小红书风格 */
+  padding: 12px;
   font-size: 16px;
   font-weight: 600;
   transition: all 0.3s;
@@ -310,7 +310,7 @@ const handleSubmit = () => {
   justify-content: center;
 
   &.active {
-    background: #ff2442; /* 小红书品牌色 */
+    background-color: #ff2442; /* 小红书品牌色 */
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(255, 36, 66, 0.2);
 
@@ -346,7 +346,7 @@ const handleSubmit = () => {
     }
   }
 
-  .footer-btn-wrap {
+  .submit-button-container {
     background: #161823;
   }
 }
