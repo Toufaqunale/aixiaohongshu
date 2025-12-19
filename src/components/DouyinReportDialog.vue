@@ -79,7 +79,7 @@ const reportCategories = ref([
   }, 
   { 
     title: '虚假不实', 
-    icon: 'info-o', 
+    icon: 'close', 
     subOptions: [ 
       { text: '造谣传谣', desc: '散布未经证实、损害公共利益或他人的谣言' }, 
       { text: '虚假营销', desc: '发布虚假广告、夸大宣传、欺诈性销售' }, 
