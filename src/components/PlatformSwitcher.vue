@@ -47,20 +47,13 @@ const activeIndex = computed(() => {
 
 <style scoped lang="scss">
 .platform-switcher-wrap {
-  position: fixed;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+  background: #fff;
+  width: 100%;
+  position: relative;
   z-index: 2000;
-  padding: 4px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 0.5px solid rgba(255, 255, 255, 0.3);
-  width: auto;
-  max-width: 90vw;
 }
 
 .switcher-container {
@@ -68,6 +61,9 @@ const activeIndex = computed(() => {
   position: relative;
   width: 180px;
   height: 32px;
+  padding: 2px;
+  background: #f5f5f5;
+  border-radius: 18px;
 }
 
 @media screen and (max-width: 375px) {

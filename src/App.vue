@@ -36,6 +36,8 @@ body {
 .app-container {
   width: 100%;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
   transition: background-color 0.5s;
 }
 
@@ -47,12 +49,29 @@ body {
   background-color: #000;
 }
 
+/* 抖音模式下 switcher 背景色调整 */
+.app-container.douyin :deep(.platform-switcher-wrap) {
+  background-color: #000;
+  border-bottom-color: #1a1a1a;
+}
+
+.app-container.douyin :deep(.switcher-container) {
+  background-color: #1a1a1a;
+}
+
+.app-container.douyin :deep(.indicator) {
+  background-color: #333;
+}
+
+.app-container.douyin :deep(.platform-name) {
+  color: #999;
+}
+
 .content-wrapper {
+  flex: 1;
   width: 100%;
-  height: 100%;
-  min-height: 100vh; /* 确保容器至少占满全屏，防止切换时高度坍塌 */
   position: relative;
-  overflow: hidden; /* 创建独立布局上下文，防止内部抖动溢出 */
+  overflow: hidden;
 }
 
 /* 平台切换动画：横向平移 + 缩放 */
