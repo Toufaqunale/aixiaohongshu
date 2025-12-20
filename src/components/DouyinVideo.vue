@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, onUnmounted } from 'vue'
 
 // 定义组件名称，以便 KeepAlive 正确缓存
 defineOptions({
@@ -8,16 +8,80 @@ defineOptions({
 import { ElMessage } from 'element-plus'
 import { useReport } from '../composables/useReport'
 import DouyinReportDialog from './DouyinReportDialog.vue'
+import DouyinCommentPanel from './DouyinCommentPanel.vue'
+import DouyinSharePanel from './DouyinSharePanel.vue'
 
 // 1. 基础状态
-const { isVisible: showReport, openReport, onReportSubmit: handleReportSubmit } = useReport()
+const { isVisible: showReport, onReportSubmit: handleReportSubmit } = useReport()
+const showComments = ref(false)
+const autoFocusComment = ref(false)
+const commentPanelRef = ref<any>(null)
+
+const openComments = (autoFocus = false) => {
+  autoFocusComment.value = autoFocus
+  showComments.value = true
+}
+const showShare = ref(false)
 const isLiked = ref(false)
-const likeCount = ref(128400)
-const commentCount = ref(5621)
-const collectCount = ref(32000)
-const shareCount = ref(8900)
+const likeCount = ref(50)
+const commentCount = ref(2)
+const collectCount = ref(2)
+const shareCount = ref(28)
 const isFollowed = ref(false)
 const isCollected = ref(false)
+
+// 快速评论逻辑
+const showQuickEmojis = ref(false)
+const quickEmojis = ['👏', '🤣', '🤠']
+const longPressTimer = ref<any>(null)
+
+const handleTouchStart = () => {
+  longPressTimer.value = setTimeout(() => {
+    showQuickEmojis.value = true
+    // 震动反馈 (如果支持)
+    if (window.navigator && window.navigator.vibrate) {
+      window.navigator.vibrate(50)
+    }
+  }, 500)
+}
+
+const handleTouchEnd = () => {
+  if (longPressTimer.value) {
+    clearTimeout(longPressTimer.value)
+    longPressTimer.value = null
+  }
+}
+
+const sendQuickComment = (emoji: string) => {
+  if (commentPanelRef.value) {
+    commentPanelRef.value.addExternalComment(emoji)
+    ElMessage({
+      message: '已评论',
+      type: 'success',
+      duration: 1500,
+      offset: 100
+    })
+  }
+  showQuickEmojis.value = false
+}
+
+// 点击外部关闭快速评论
+const handleClickOutside = (e: MouseEvent) => {
+  if (showQuickEmojis.value) {
+    const target = e.target as HTMLElement
+    if (!target.closest('.quick-emoji-bar') && !target.closest('.comment-sidebar-item')) {
+      showQuickEmojis.value = false
+    }
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('click', handleClickOutside)
+})
 
 // 2. 视频信息
 const authorName = ref('极客创意工作室')
@@ -74,6 +138,8 @@ const toggleFollow = () => {
   isFollowed.value = !isFollowed.value
   if (isFollowed.value) {
     ElMessage.success('已关注')
+  } else {
+    ElMessage.info('已取消关注')
   }
 }
 
@@ -88,6 +154,11 @@ const formatNumber = (num: number) => {
     return (num / 10000).toFixed(1) + 'w'
   }
   return num
+}
+const handleAvatarError = (e: Event) => {
+  const target = e.target as HTMLImageElement
+  const seed = Math.floor(Math.random() * 1000)
+  target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`
 }
 </script>
 
@@ -106,7 +177,7 @@ const formatNumber = (num: number) => {
       <!-- 头像 & 关注 -->
       <div class="sidebar-item avatar-wrap">
         <div class="avatar">
-          <img src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg" alt="avatar" />
+          <img src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg" alt="avatar" @error="handleAvatarError" />
         </div>
         <div 
           class="follow-btn" 
@@ -120,47 +191,68 @@ const formatNumber = (num: number) => {
       <!-- 点赞 -->
       <div class="sidebar-item" @click.stop="toggleLike">
         <div class="icon-box" :class="{ 'is-liked': isLiked }">
-          <van-icon :name="isLiked ? 'like' : 'like'" :color="isLiked ? '#fe2c55' : '#fff'" />
+          <van-icon name="like" :color="isLiked ? '#ff2c55' : '#fff'" />
         </div>
         <span class="count">{{ formatNumber(likeCount) }}</span>
       </div>
 
       <!-- 评论 -->
-      <div class="sidebar-item">
+      <div 
+        class="sidebar-item comment-sidebar-item" 
+        @click.stop="openComments(false)"
+        @touchstart="handleTouchStart"
+        @touchend="handleTouchEnd"
+        @mousedown="handleTouchStart"
+        @mouseup="handleTouchEnd"
+        @mouseleave="handleTouchEnd"
+      >
         <div class="icon-box">
           <van-icon name="comment" color="#fff" />
         </div>
         <span class="count">{{ formatNumber(commentCount) }}</span>
+
+        <!-- 快速评论表情栏 -->
+        <transition name="emoji-slide">
+          <div v-if="showQuickEmojis" class="quick-emoji-bar" @click.stop>
+            <div 
+              v-for="emoji in quickEmojis" 
+              :key="emoji" 
+              class="emoji-item"
+              @click.stop="sendQuickComment(emoji)"
+            >
+              {{ emoji }}
+            </div>
+          </div>
+        </transition>
       </div>
 
       <!-- 收藏 -->
       <div class="sidebar-item" @click.stop="toggleCollect">
         <div class="icon-box" :class="{ 'is-collected': isCollected }">
-          <van-icon :name="isCollected ? 'star' : 'star'" :color="isCollected ? '#face15' : '#fff'" />
+          <van-icon name="star" :color="isCollected ? '#face15' : '#fff'" />
         </div>
         <span class="count">{{ formatNumber(collectCount) }}</span>
       </div>
 
       <!-- 转发 -->
-      <div class="sidebar-item">
+      <div class="sidebar-item" @click.stop="showShare = true">
         <div class="icon-box">
-          <van-icon name="share" color="#fff" />
+          <van-icon name="share" color="#fff" style="transform: scaleX(-1);" />
         </div>
         <span class="count">{{ formatNumber(shareCount) }}</span>
       </div>
 
-      <!-- 更多/举报 -->
-      <div class="sidebar-item" @click.stop="openReport('post')">
-        <div class="icon-box">
-          <van-icon name="ellipsis" color="#fff" />
-        </div>
-        <span class="count">更多</span>
-      </div>
-
       <!-- 唱片机 -->
-      <div class="sidebar-item music-disc">
-        <div class="disc-inner">
-          <img src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg" alt="music" />
+      <div class="sidebar-item music-disc-wrap">
+        <div class="music-notes">
+          <div class="note note-1">♪</div>
+          <div class="note note-2">♫</div>
+          <div class="note note-3">♩</div>
+        </div>
+        <div class="music-disc">
+          <div class="disc-inner">
+            <img src="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg" alt="music" />
+          </div>
         </div>
       </div>
     </div>
@@ -169,7 +261,11 @@ const formatNumber = (num: number) => {
     <div class="bottom-info">
       <div class="author-row">
         <span class="author-name">@{{ authorName }}</span>
-        <span class="follow-tag" v-if="!isFollowed"> · 关注</span>
+        <span 
+          class="follow-tag" 
+          v-if="!isFollowed"
+          @click.stop="toggleFollow"
+        > · 关注</span>
       </div>
       
       <div class="description-wrap" :class="{ expanded: isExpanded }">
@@ -191,6 +287,15 @@ const formatNumber = (num: number) => {
           <span>{{ musicName }}</span>
         </div>
       </div>
+
+      <!-- 底部发评论触发器 -->
+      <div class="video-input-trigger" @click.stop="openComments(true)">
+        <div class="fake-input">发条评论，说说你的感受...</div>
+        <div class="input-right">
+          <span class="at-icon">@</span>
+          <van-icon name="smile-o" />
+        </div>
+      </div>
     </div>
 
     <!-- 4. 双击红心动画 -->
@@ -210,6 +315,20 @@ const formatNumber = (num: number) => {
       v-model:visible="showReport" 
       type="post" 
       @submit="handleReportSubmit"
+    />
+
+    <!-- 6. 评论弹窗 (抖音 1:1 风格) -->
+    <DouyinCommentPanel 
+      ref="commentPanelRef"
+      v-model:visible="showComments"
+      v-model:autoFocusInput="autoFocusComment"
+      v-model:commentCount="commentCount"
+    />
+
+    <!-- 7. 分享弹窗 (抖音 1:1 风格) -->
+    <DouyinSharePanel 
+      v-model:visible="showShare"
+      v-model:shareCount="shareCount"
     />
   </div>
 </template>
@@ -253,12 +372,12 @@ const formatNumber = (num: number) => {
 /* 右侧侧边栏 */
 .right-sidebar {
   position: absolute;
-  right: 8px;
-  bottom: 80px;
+  right: 12px;
+  bottom: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   z-index: 10;
 }
 
@@ -267,11 +386,16 @@ const formatNumber = (num: number) => {
   flex-direction: column;
   align-items: center;
   cursor: pointer;
+  position: relative;
   
   .icon-box {
-    font-size: 32px;
-    margin-bottom: 4px;
+    font-size: 38px;
+    margin-bottom: 0px;
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
     
     &:active {
       transform: scale(0.8);
@@ -280,24 +404,67 @@ const formatNumber = (num: number) => {
     &.is-liked {
       animation: like-scale 0.4s ease;
     }
+
+    .van-icon {
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+    }
   }
   
   .count {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
+
+  /* 快速评论表情栏 */
+  .quick-emoji-bar {
+    position: absolute;
+    right: 50px;
+    top: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 100;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
+    
+    .emoji-item {
+      font-size: 24px;
+      padding: 4px;
+      transition: transform 0.1s;
+      
+      &:active {
+        transform: scale(1.3);
+      }
+    }
+  }
+}
+
+.emoji-slide-enter-active,
+.emoji-slide-leave-active {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.emoji-slide-enter-from,
+.emoji-slide-leave-to {
+  opacity: 0;
+  transform: translateX(20px) scale(0.8);
 }
 
 .avatar-wrap {
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   
   .avatar {
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    border: 1.5px solid #fff;
+    border: 1px solid #fff;
     overflow: hidden;
     
     img {
@@ -307,42 +474,85 @@ const formatNumber = (num: number) => {
     }
   }
   
+  /* 关注按钮 */
   .follow-btn {
     position: absolute;
-    bottom: -8px;
+    bottom: -10px;
     left: 50%;
     transform: translateX(-50%);
     width: 20px;
     height: 20px;
-    background: #fe2c55;
+    background: #ff2c55;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    transition: all 0.2s;
+    
+    .van-icon {
+      font-size: 12px;
+      color: #fff;
+    }
     
     &.followed {
-      background: #face15;
+      background: #fff;
+      .van-icon {
+        color: #ff2c55;
+      }
     }
   }
 }
 
+.music-disc-wrap {
+  margin-top: 12px;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .music-disc {
-  margin-top: 10px;
   width: 44px;
   height: 44px;
-  background: #333;
+  background: repeating-radial-gradient(
+    circle at center,
+    #111 0,
+    #111 2px,
+    #222 2px,
+    #222 4px
+  );
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: disc-rotate 5s linear infinite;
+  animation: disc-rotate 4s linear infinite;
+  border: 9px solid #111;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.1) 100%);
+    pointer-events: none;
+  }
   
   .disc-inner {
     width: 26px;
     height: 26px;
     border-radius: 50%;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     
     img {
       width: 100%;
@@ -352,14 +562,88 @@ const formatNumber = (num: number) => {
   }
 }
 
+.music-notes {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  
+  .note {
+    position: absolute;
+    color: #fff;
+    font-size: 14px;
+    opacity: 0;
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+  }
+  
+  .note-1 { animation: note-float-1 3s linear infinite; }
+  .note-2 { animation: note-float-2 3s linear infinite 1s; }
+  .note-3 { animation: note-float-3 3s linear infinite 2s; }
+}
+
+@keyframes note-float-1 {
+  0% { transform: translate(0, 0) rotate(0) scale(0.5); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translate(-30px, -60px) rotate(-45deg) scale(1.2); opacity: 0; }
+}
+
+@keyframes note-float-2 {
+  0% { transform: translate(0, 0) rotate(0) scale(0.5); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translate(-50px, -40px) rotate(45deg) scale(1.2); opacity: 0; }
+}
+
+@keyframes note-float-3 {
+  0% { transform: translate(0, 0) rotate(0) scale(0.5); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translate(-40px, -70px) rotate(-20deg) scale(1.2); opacity: 0; }
+}
+
 /* 底部信息 */
 .bottom-info {
   position: absolute;
   left: 12px;
-  bottom: 25px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
   right: 80px;
   z-index: 10;
   pointer-events: auto;
+  box-sizing: border-box;
+}
+
+.video-input-trigger {
+  margin-top: 16px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  backdrop-filter: blur(5px);
+  box-sizing: border-box;
+
+  .fake-input {
+    flex: 1;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 8px;
+  }
+
+  .input-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: 18px;
+
+    .at-icon {
+      font-weight: 500;
+    }
+  }
 }
 
 .author-row {

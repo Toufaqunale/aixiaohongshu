@@ -49,7 +49,7 @@ const sourceOptions = [
   { text: '原创作品为站外笔记', value: 'external' }
 ];
 
-const tempSourceValue = ref('');
+
 
 const onSourceConfirm = ({ selectedOptions }: any) => {
   sourceValue.value = selectedOptions[0].text;

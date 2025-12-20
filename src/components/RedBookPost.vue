@@ -8,7 +8,6 @@ defineOptions({
 import { 
   ArrowLeft, 
   MoreFilled, 
-  Share, 
   Warning
 } from '@element-plus/icons-vue';
 import { showToast } from 'vant';
@@ -20,7 +19,7 @@ import ShareSheet from './ShareSheet.vue';
 import ReachedBottomTip from './ReachedBottomTip.vue';
 
 // 1. 状态管理
-const { isVisible: reportVisible, reportType, targetId: reportTargetId, openReport, onReportSubmit } = useReport();
+const { isVisible: reportVisible, reportType, targetId: reportTargetId, onReportSubmit } = useReport();
 const newReportVisible = ref(false);
 const rightsReportVisible = ref(false);
 const shareVisible = ref(false);
@@ -41,7 +40,7 @@ const formatCount = (count: number) => {
   return count.toString();
 };
 const isFollowed = ref(false);
-const commentInput = ref('');
+// const commentInput = ref('');
 const inputRef = ref<HTMLInputElement | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const xhsPageRef = ref<HTMLElement | null>(null);
@@ -391,6 +390,7 @@ const handleShareClick = () => {
   showToast('点击了分享');
 };
 
+/* 
 const handlePublishComment = () => {
   if (!commentInput.value.trim()) {
     showToast('请输入内容');
@@ -400,6 +400,7 @@ const handlePublishComment = () => {
   showToast('发布成功');
   commentInput.value = '';
 };
+*/
 
 const handleCommentLike = (comment: Comment) => {
   comment.isLiked = !comment.isLiked;
@@ -428,6 +429,7 @@ const toggleReplies = (comment: Comment) => {
   comment.showReplies = !comment.showReplies;
 };
 
+/* 
 const handleInputToolClick = (type: 'at' | 'emoji' | 'photo') => {
   switch (type) {
     case 'at':
@@ -442,6 +444,7 @@ const handleInputToolClick = (type: 'at' | 'emoji' | 'photo') => {
       break;
   }
 };
+*/
 
 const handleFileChange = (event: Event) => {
   const input = event.target as HTMLInputElement;
@@ -458,7 +461,7 @@ const handleFileChange = (event: Event) => {
   }
 };
 
-const handleReport = (id?: string | number, type: 'post' | 'comment' = 'post') => {
+const handleReport = (_id?: string | number, _type: 'post' | 'comment' = 'post') => {
   // 放弃旧的 ReportDialog，改用新的 1:1 高保真 RedBookReport 界面
   newReportVisible.value = true;
 };

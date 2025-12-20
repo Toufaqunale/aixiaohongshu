@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { showToast, showLoadingToast } from 'vant';
+import { showToast } from 'vant';
 import { 
   Warning,
   Link,
   Download,
-  ChatDotRound,
-  Connection,
   Picture,
   Close,
   UserFilled,
