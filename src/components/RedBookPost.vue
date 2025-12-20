@@ -671,15 +671,15 @@ const handleNewReportSelect = (reason: any) => {
 
       <div class="bottom-actions-right">
         <div class="bottom-action-item" @click="handleLike">
-          <van-icon :name="isLiked ? 'like' : 'like-o'" :class="{ 'is-active': isLiked }" />
+          <van-icon :name="isLiked ? 'like' : 'like-o'" :class="{ 'is-active': isLiked, 'action-icon': true }" />
           <span class="action-count">{{ formatCount(likeCount) }}</span>
         </div>
         <div class="bottom-action-item" @click="handleCollect">
-          <van-icon :name="isCollected ? 'star' : 'star-o'" :class="{ 'is-active': isCollected }" />
+          <van-icon :name="isCollected ? 'star' : 'star-o'" :class="{ 'is-active': isCollected, 'action-icon': true }" />
           <span class="action-count">{{ formatCount(collectCount) }}</span>
         </div>
         <div class="bottom-action-item" @click="handleCommentClick">
-          <van-icon name="comment-o" />
+          <van-icon name="chat-o" class="action-icon" />
           <span class="action-count">{{ formatCount(commentCount) }}</span>
         </div>
       </div>
@@ -1476,74 +1476,76 @@ const handleNewReportSelect = (reason: any) => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 52px;
+  height: 54px;
   background: #fff;
-  border-top: 0.5px solid #f5f5f5;
+  border-top: 0.5px solid #eee;
   display: flex;
   align-items: center;
-  padding: 0 8px; /* 减小两侧边距 */
+  padding: 0 12px;
   z-index: 100;
   padding-bottom: env(safe-area-inset-bottom);
 }
 
 .comment-input-wrap {
   flex: 1;
-  height: 34px;
-  background: #f5f5f5;
-  border-radius: 17px;
+  height: 38px;
+  background: #f6f6f6;
+  border-radius: 19px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
-  margin-right: 8px; /* 减小输入框与右侧图标的间距 */
-  min-width: 0; /* 允许 flex 项目缩小 */
+  padding: 0 14px;
+  margin-right: 12px;
+  min-width: 0;
 }
 
 .edit-icon {
-  font-size: 14px;
+  font-size: 18px;
   color: #666;
-  margin-right: 4px;
+  margin-right: 6px;
   flex-shrink: 0;
 }
 
 .bottom-input-placeholder {
   flex: 1;
-  font-size: 13px;
+  font-size: 16px;
   color: #999;
+  letter-spacing: 0px;
+  font-weight: 400;
 }
 
 .bottom-actions-right {
   display: flex;
   align-items: center;
-  gap: 10px; /* 减小图标之间的间距，原为 16px */
-  flex-shrink: 0; /* 确保右侧图标不被压缩 */
+  gap: 16px;
+  flex-shrink: 0;
 }
 
 .bottom-action-item {
   display: flex;
   align-items: center;
-  gap: 2px; /* 减小图标与数字的间距 */
+  gap: 4px;
   color: #333;
   cursor: pointer;
 }
 
-.bottom-action-item .van-icon {
-  font-size: 20px; /* 稍微减小图标大小，原为 22px */
-  font-weight: 500;
+.action-icon {
+  font-size: 24px !important;
+  color: #333;
 }
 
-.bottom-action-item .van-icon.is-active {
-  color: #ff2442;
+.action-icon.is-active {
+  color: #ff2442 !important;
 }
 
 .bottom-action-item .van-icon-star.is-active {
-  color: #ffb800;
+  color: #ffb800 !important;
 }
 
 .action-count {
-  font-size: 12px; /* 稍微减小数字字体，原为 13px */
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 400;
   color: #333;
-  white-space: nowrap; /* 确保数字不换行 */
+  white-space: nowrap;
 }
 
 .publish-btn {
